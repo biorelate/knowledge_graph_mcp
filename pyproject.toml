@@ -1,0 +1,17 @@
+[project]
+name = "biorelate-knowledge-graph"
+version = "1.0.5"
+description = "Repository to guide Galactic Data customers to build knowledge graphs and integrate other tools."
+readme = "README.md"
+requires-python = ">=3.11.4"
+dependencies = [
+    "dbt-bigquery>=1.11.0",
+    "dbt-core>=1.11.2",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.1.0",
+    "pre-commit>=4.5.1",
+    "shandy-sqlfmt>=0.29.0",
+]

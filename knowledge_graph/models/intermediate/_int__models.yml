@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: int_relationships_filtered
+    description: >
+      Unpivots the wide consolidated_relationships staging model into a long-format
+      table of one row per (entity1, relationship_type, entity2) triple. Applies two
+      filters: a minimum evidence threshold (min_evidence var) and an ontology allowlist
+      (ontologies var) applied to both entities.
+    columns:
+      - name: entity1_id
+        description: Ontology-namespaced identifier for the first entity, e.g. "HGNC:1234".
+        data_type: string
+        tests:
+          - not_null
+      - name: relationship_type
+        description: >
+          The type of relationship between the two entities.
+          One of: associates_with, binding, biomarker, causes_no_change, decreases,
+          increases, regulates, treats.
+        data_type: string
+        tests:
+          - not_null
+          - accepted_values:
+              values: "{{ var('relationship_types') }}"
+      - name: entity2_id
+        description: Ontology-namespaced identifier for the second entity, e.g. "MONDO:0001234".
+        data_type: string
+        tests:
+          - not_null
+      - name: proportion
+        description: >
+          Fraction of total entity-pair mentions that support this relationship type.
+          Calculated as <relationship_type>_count / total_mentions.
+        data_type: float64
+        tests:
+          - not_null
+      - name: evidence_count
+        description: >
+          Raw number of mentions supporting this relationship type for the entity pair.
+          Always >= the min_evidence threshold.
+        data_type: int64
+        tests:
+          - not_null

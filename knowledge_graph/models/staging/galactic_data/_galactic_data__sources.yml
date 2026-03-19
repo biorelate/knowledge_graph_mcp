@@ -1,0 +1,8 @@
+version: 2
+sources:
+  - name: galactic_data
+    database: "{{ env_var('DBT_SOURCE_DATABASE') }}"
+    schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+    tables:
+      - name: consolidated_relationships
+      - name: relationship_entity_statistics

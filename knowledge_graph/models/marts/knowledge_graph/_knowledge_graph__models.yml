@@ -1,0 +1,76 @@
+version: 2
+
+models:
+  - name: graph_nodes
+    description: >
+      All unique entities that appear in at least one filtered relationship, enriched
+      with their human-readable name. Intended as the nodes input for Neo4j import.
+    columns:
+      - name: entity_id
+        description: Ontology-namespaced identifier for the entity, e.g. "HGNC:1234".
+        data_type: string
+        tests:
+          - not_null
+          - unique
+      - name: entity_name
+        description: Human-readable name for the entity, e.g. "BRCA1".
+        data_type: string
+        tests:
+          - not_null
+
+  - name: graph_associates_with_relationships
+    description: Filtered relationships of type associates_with. See int_relationships_filtered for filtering logic.
+    columns: &relationship_columns
+      - name: entity1_id
+        description: Ontology-namespaced identifier for the source entity.
+        data_type: string
+        tests:
+          - not_null
+      - name: relationship_type
+        description: Always 'associates_with' for this model.
+        data_type: string
+        tests:
+          - not_null
+      - name: entity2_id
+        description: Ontology-namespaced identifier for the target entity.
+        data_type: string
+        tests:
+          - not_null
+      - name: proportion
+        description: Fraction of total entity-pair mentions supporting this relationship type.
+        data_type: float64
+        tests:
+          - not_null
+      - name: evidence_count
+        description: Raw number of mentions supporting this relationship type for the entity pair.
+        data_type: int64
+        tests:
+          - not_null
+
+  - name: graph_binding_relationships
+    description: Filtered relationships of type binding. See int_relationships_filtered for filtering logic.
+    columns: *relationship_columns
+
+  - name: graph_biomarker_relationships
+    description: Filtered relationships of type biomarker. See int_relationships_filtered for filtering logic.
+    columns: *relationship_columns
+
+  - name: graph_causes_no_change_relationships
+    description: Filtered relationships of type causes_no_change. See int_relationships_filtered for filtering logic.
+    columns: *relationship_columns
+
+  - name: graph_decreases_relationships
+    description: Filtered relationships of type decreases. See int_relationships_filtered for filtering logic.
+    columns: *relationship_columns
+
+  - name: graph_increases_relationships
+    description: Filtered relationships of type increases. See int_relationships_filtered for filtering logic.
+    columns: *relationship_columns
+
+  - name: graph_regulates_relationships
+    description: Filtered relationships of type regulates. See int_relationships_filtered for filtering logic.
+    columns: *relationship_columns
+
+  - name: graph_treats_relationships
+    description: Filtered relationships of type treats. See int_relationships_filtered for filtering logic.
+    columns: *relationship_columns

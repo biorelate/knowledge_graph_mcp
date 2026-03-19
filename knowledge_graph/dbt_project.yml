@@ -1,0 +1,62 @@
+name: "knowledge_graph"
+version: "1.0.0"
+config-version: 2
+
+# This setting configures which "profile" dbt uses for this project.
+profile: "knowledge_graph"
+
+# These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets: # directories to be removed by `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
+# In this example config, we tell dbt to build all models in the example/
+# directory as views. These settings can be overridden in the individual model
+# files using the `{{ config(...) }}` macro.
+models:
+  knowledge_graph:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: ephemeral
+    marts:
+      +materialized: table
+
+vars:
+  min_evidence: 5
+  relationship_types: [
+      "associates_with",
+      "binding",
+      "biomarker",
+      "causes_no_change",
+      "decreases",
+      "increases",
+      "regulates",
+      "treats",
+    ]
+  ontologies: [
+      "chebi", # Chemicals
+      "cl", # Cell types
+      "clo", # Cell line ontology
+      "umls", # Unified Medical Language System - Drugs
+      "go", # Gene Ontology - Biological Processes
+      "hgnc", # Gene
+      "hgnc.gene_family", # Gene Families
+      "mesh", # Medical Subject Headings - Complexes, genes and gene families
+      "mondo", # Diseases
+      "pw", # Pathways
+      "ncbitaxon", # Taxonomy/Species
+      "uberon", # Anatomy
+    ]

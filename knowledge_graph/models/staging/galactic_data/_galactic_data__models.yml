@@ -1,0 +1,65 @@
+version: 2
+
+models:
+  - name: stg_galactic_data__consolidated_relationships
+    description: >
+      Staging model over the raw consolidated_relationships source table. Each row
+      represents a unique entity pair (entity1, entity2) with per-relationship-type
+      evidence counts and a total mention count across all relationship types.
+    columns:
+      - name: entity1_id
+        description: Ontology-namespaced identifier for the first entity, e.g. "HGNC:1234".
+        data_type: string
+        tests:
+          - not_null
+      - name: entity2_id
+        description: Ontology-namespaced identifier for the second entity, e.g. "MONDO:0001234".
+        data_type: string
+        tests:
+          - not_null
+      - name: total_mentions
+        description: Total number of mentions of the entity pair across all relationship types.
+        data_type: int64
+        tests:
+          - not_null
+      - name: associates_with_count
+        description: Number of relationship mentions supporting an associates_with relationship between the entity pair.
+        data_type: int64
+      - name: binding_count
+        description: Number of relationship mentions supporting a binding relationship between the entity pair.
+        data_type: int64
+      - name: biomarker_count
+        description: Number of relationship mentions supporting a biomarker relationship between the entity pair.
+        data_type: int64
+      - name: causes_no_change_count
+        description: Number of relationship mentions supporting a causes_no_change relationship between the entity pair.
+        data_type: int64
+      - name: decreases_count
+        description: Number of relationship mentions supporting a decreases relationship between the entity pair.
+        data_type: int64
+      - name: increases_count
+        description: Number of relationship mentions supporting an increases relationship between the entity pair.
+        data_type: int64
+      - name: regulates_count
+        description: Number of relationship mentions supporting a regulates relationship between the entity pair.
+        data_type: int64
+      - name: treats_count
+        description: Number of relationship mentions supporting a treats relationship between the entity pair.
+        data_type: int64
+
+  - name: stg_galactic_data__relationship_entity_statistics
+    description: >
+      Staging model over the raw relationship_entity_statistics source table.
+      Contains the human-readable name for each entity referenced in relationships.
+    columns:
+      - name: entity_id
+        description: Ontology-namespaced identifier for the entity, e.g. "HGNC:1234".
+        data_type: string
+        tests:
+          - not_null
+          - unique
+      - name: entity_name
+        description: Human-readable name for the entity, e.g. "BRCA1".
+        data_type: string
+        tests:
+          - not_null
