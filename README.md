@@ -1,21 +1,80 @@
-# biorelate_knowledge_graph
-## Required Data:
+```
+ ____  _                _       _
+| __ )(_) ___  _ __ ___| | __ _| |_ ___
+|  _ \| |/ _ \| '__/ _ \ |/ _` | __/ _ \
+| |_) | | (_) | | |  __/ | (_| | ||  __/
+|____/|_|\___/|_|  \___|_|\__,_|\__\___|
+
+ _  __                    _          _
+| |/ /_ __   _____      _| | ___  __| | __ _  ___
+| ' /| '_ \ / _ \ \ /\ / / |/ _ \/ _` |/ _` |/ _ \
+| . \| | | | (_) \ V  V /| |  __/ (_| | (_| |  __/
+|_|\_\_| |_|\___/ \_/\_/ |_|\___|\__,_|\__, |\___|
+                                       |___/
+  ____                 _
+ / ___|_ __ __ _ _ __ | |__
+| |  _| '__/ _` | '_ \| '_ \
+| |_| | | | (_| | |_) | | | |
+ \____|_|  \__,_| .__/|_| |_|
+                |_|
+  ___     __  __  ____ ____
+ ( _ )   |  \/  |/ ___|  _ \
+ / _ \/\ | |\/| | |   | |_) |
+| (_>  < | |  | | |___|  __/
+ \___/\/ |_|  |_|\____|_|
+```
+
+# 🧬 Biorelate Knowledge Graph & MCP
+
+## 📋 Required Data
 
 For this build process you will need access to a Biorelate Galactic Data. This can be stored in a dbt compatible
 database technology such as BigQuery, Redshift, Snowflake, etc.
 
 The specific tables required from the Biorelate Galactic Data are defined in [the source schema for dbt](knowledge_graph/models/staging/galactic_data/_galactic_data__sources.yml).
 
-## Building the Knowledge Graph
+## 🛠️ Prerequisites
+
+This project uses [uv](https://docs.astral.sh/uv/) for Python package management.
+
+### Installing uv
+
+**macOS / Linux:**
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+**Windows:**
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Or via pip:
+```bash
+pip install uv
+```
+
+See the [full installation guide](https://docs.astral.sh/uv/getting-started/installation/) for more options.
+
+### Installing project dependencies
+
+Once uv is installed, run the following from the repo root to install all dependencies:
+
+```bash
+uv sync
+```
+
+## 🏗️ Building the Knowledge Graph
+
 This repository contains code and ETL models to create a knowledge graph from Biorelate Galactic Data.
 
 Under the `knowledge_graph/models` directory, you will find dbt models that define the structure of the knowledge graph, including tables and relationships. The `dbt_project.yml` file contains the configuration for the dbt project, specifying settings such as the project name, version, and profile to use, and other knowledge graph related configurations, e.g. what ontologies to include and a minimum amount of evidence.
 
-The models follow the [dbt best practices layered architecture](https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview): staging views over raw sources, ephemeral intermediate models for business logic, and materialized mart tables as the final outputs. See be.lw flr for more details on the dbt models and their structure.
+The models follow the [dbt best practices layered architecture](https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview): staging views over raw sources, ephemeral intermediate models for business logic, and materialized mart tables as the final outputs. See below for more details on the dbt models and their structure.
 
 ---
 
-### dbt Project Structure
+### 📁 dbt Project Structure
 
 The `knowledge_graph/` dbt project follows the [dbt best practices layered architecture](https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview). When adding or modifying models, place them in the appropriate layer:
 
@@ -56,7 +115,7 @@ The macro ([`macros/select_relationships_by_type.sql`](knowledge_graph/macros/se
 - Intermediate: `int_<entities>_<verb>s.sql`
 - Marts: descriptive plain-English names, e.g. `graph_nodes.sql`, `graph_<type>_relationships.sql`
 
-### Building the Knowledge Graph with dbt
+### ▶️ Building the Knowledge Graph with dbt
 
 To build the knowledge graph from the dbt project, first change directory into the dbt project folder
 `knowledge_graph`
@@ -113,7 +172,7 @@ dbt build --select knowledge_graph
 
 Once the build is complete, the knowledge graph tables will be created in the specified database dataset. You can then query these tables to explore the knowledge graph data.
 
-#### Parameterizing the Knowledge Graph Build
+#### ⚙️ Parameterizing the Knowledge Graph Build
 
 The knowledge graph build process can be customized using several configuration variables defined in the `dbt_project.yml` file. These variables allow you to control various aspects of the knowledge graph generation, such as which ontologies to include, the minimum evidence required for relationships, and other settings.
 
@@ -121,7 +180,7 @@ Please see the `vars` section of the `dbt_project.yml` file for a list of availa
 
 If you wish to extend the configurations further, you can modify the dbt models to include additional parameters or logic as needed for your specific use case.
 
-### Output Tables
+### 📊 Output Tables
 
 The dbt build produces the following tables in your data warehouse:
 
@@ -129,18 +188,18 @@ The dbt build produces the following tables in your data warehouse:
 - `graph_<relationship_type>_relationships`: one table per relationship type (e.g. `graph_increases_relationships`), each containing `entity1_id`, `entity2_id`, `proportion`, and `evidence_count`.
 
 
-### General Guidance:
+### 💡 General Guidance
+
 - We would generally advise starting small and building up with more data and complexity as you go, the fewer nodes and edges there are in the graph the easier it will be to establish the ETL to Neo4j.
 - We have included parameterization in the dbt models for minimum evidence thresholds, this can be used to filter out low evidence relationships which may add noise to the graph either from NLP extraction or from the underlying data (e.g. a relationship mentioned in one paper once in 1890). Starting with a higher evidence threshold can help to create a more manageable graph to work with in the early stages of development. As you work more with the graph, and especially if there is a focus on novel / less well established concepts the evidence threshold can be reduced to include more relationships.
 - We have also included an ontology filter in the dbt models which can limit the graph to certain concepts, this can also help to create a more manageable graph in the early stages, e.g. you could limit the graph to only include relationships between genes, chemicals, diseases etc.
 - All relationship types are included in the output tables, but it can be worth considering pruning down the types. E.g. frequently the subset of "increases", "decreases", "regulates", "binding", "biomarker" and "treats" is a good starting point.
 
-## Neo4j Export
+## 🗄️ Neo4j Export
 
-Once the knowledge graph is built you can export the required tables to CSV using your warehouse's export functionality.
-export functionality. These CSV files can then be imported into Neo4j using the Neo4j Data Importer tool or Cypher scripts.
+Once the knowledge graph is built you can export the required tables to CSV using your warehouse's export functionality. These CSV files can then be imported into Neo4j using the Neo4j Data Importer tool or Cypher scripts.
 
-The files need to import the graph into Neo4j should include:
+The files needed to import the graph into Neo4j should include:
 - `graph_nodes.csv`: This file should contain the nodes of the graph, with columns for `entity_id`, `entity_name`, and any other relevant node properties.
 - `graph_<relationship_type>_relationships.csv`: These files should contain the relationships between nodes for each relationship type, with columns for `start_entity_id`, `end_entity_id`, and any other relevant relationship properties (e.g. evidence count, proportion).
 
@@ -152,9 +211,9 @@ You can connect either local files, or files stored in a cloud storage bucket (e
 A screenshot of the Neo4j Data Importer tool is shown below:
 ![Neo4j Data Importer Tool](docs/images/neo4j_importer_view.png)
 
-:warning: You may need to adjust the import model and/or the CSV files depending on the specific structure of your knowledge graph and the requirements of your Neo4j instance. For example, you may want to include additional properties for nodes and relationships. You can refer to the Neo4j import documentation for more details also: https://neo4j.com/docs/data-importer/current/
+> ⚠️ You may need to adjust the import model and/or the CSV files depending on the specific structure of your knowledge graph and the requirements of your Neo4j instance. For example, you may want to include additional properties for nodes and relationships. You can refer to the Neo4j import documentation for more details also: https://neo4j.com/docs/data-importer/current/
 
-### Model Context Protocol (MCP)
+## 🤖 Model Context Protocol (MCP)
 
 To connect to Claude Desktop we can update the our claude desktop configuration file, e.g.
 
@@ -183,10 +242,9 @@ To connect to Claude Desktop we can update the our claude desktop configuration 
 Once these settings have been updated you can start Claude Desktop and connect to the Neo4j knowledge graph instance.
 This example uses the `mcp-neo4j-cypher` MCP to connect to a Neo4j instance containing the knowledge graph, which is installed via [uvx](https://docs.astral.sh/uv/guides/tools/)
 
-:warning: Make sure to check the latest version of the `mcp-neo4j-cypher` MCP as there may have been updates since the time of writing.
+> ⚠️ Make sure to check the latest version of the `mcp-neo4j-cypher` MCP as there may have been updates since the time of writing.
 
 Other options include:
 - Using [MCP toolbox for Databases](https://github.com/googleapis/genai-toolbox) to connect to
 the neo4j database. This option allows for defining more advanced MCP tools (e.g. defining specific queries).
 - Creating a custom MCP server that connects to the Neo4j database and exposes specific functionality. This can be achieved with something like [FastMCP](https://gofastmcp.com/getting-started/welcome).
-
