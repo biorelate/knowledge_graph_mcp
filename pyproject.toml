@@ -1,6 +1,6 @@
 [project]
 name = "biorelate-knowledge-graph"
-version = "1.0.6"
+version = "1.0.12"
 description = "Repository to guide Galactic Data customers to build knowledge graphs and integrate other tools."
 readme = "README.md"
 requires-python = ">=3.11.4"
